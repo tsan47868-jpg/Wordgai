@@ -7,9 +7,9 @@
   <key>CFBundleDevelopmentRegion</key>
   <string>en</string>
   <key>CFBundleDisplayName</key>
-  <string>WordCraft</string>
+  <string>Wordgai</string>
   <key>CFBundleName</key>
-  <string>WordCraft</string>
+  <string>Wordgai</string>
   <key>CFBundleExecutable</key>
   <string>WordCraft</string>
   <key>CFBundleIdentifier</key>

@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Name=WordCraft
+Name=Wordgai
 GenericName=Word Processor
 Comment=Write and design documents; open and save Word files
 Exec=wordcraft %F

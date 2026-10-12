@@ -22,6 +22,7 @@ macro_rules! tl {
 
 pub mod a11y;
 pub mod a11y_pane;
+mod ai;
 pub mod backstage;
 pub mod canvas;
 pub mod caret_glide;
@@ -86,6 +87,10 @@ pub use file_dialogs::{FileDialogAnswer, FileDialogRequest, open_filters};
 /// Platform services injected by the host (file dialogs, file I/O).
 #[derive(Default)]
 pub struct Services {
+    /// Desktop: send a prompt to the configured writing assistant without blocking the UI thread.
+    pub ai_complete: Option<
+        Box<dyn Fn(String) -> std::sync::mpsc::Receiver<Result<String, String>>>,
+    >,
     /// Pick a file to open; the argument says what for (`document`, `picture`).
     pub pick_open: Option<Box<dyn Fn(&str) -> Option<String>>>,
     /// Pick a path to save to, given a suggested name.
@@ -408,6 +413,7 @@ pub struct WordApp {
     pub(crate) outline_prev_tab: Option<String>,
     /// Zotero commands in flight (`ui.zotero.*`).
     pub zotero: zotero::ZoteroLink,
+    pub(crate) ai: ai::AiWriter,
     /// The egui context, once the first frame has run (background work wakes the UI with it).
     pub(crate) ctx: Option<egui::Context>,
     /// Read Aloud: the start of the sentence the caret was last moved to, and the last error shown.
@@ -494,6 +500,7 @@ impl WordApp {
             smart_art_typing: None,
             outline_prev_tab: None,
             zotero: zotero::ZoteroLink::default(),
+            ai: ai::AiWriter::default(),
             ctx: None,
             read_aloud_at: None,
             read_aloud_error: None,
@@ -1189,6 +1196,11 @@ impl WordApp {
         self.status_msg = Some((s.into(), now_ms()));
     }
 
+    /// Open the AI writing window.
+    pub fn open_ai_writer(&mut self) {
+        self.ai.open = true;
+    }
+
     /// Media key of the selected picture, if any.
     pub(crate) fn selected_picture_media(&self) -> Option<String> {
         match wordcraft_engine::cmd::objects::selected(&self.session) {
@@ -1518,12 +1530,13 @@ impl WordApp {
         colors::show(self, &ctx);
         zotero::show_alert(self, &ctx);
         read_aloud::show(self, &ctx);
+        ai::show(self, &ctx);
         crate::keytips::show(self, &ctx, ui);
         keys::global_shortcuts(self, &ctx);
         if let Some(url) = self.canvas.open_url.take() {
             ctx.open_url(egui::OpenUrl::new_tab(url));
         }
-        let title = format!("{}{} - WordCraft", self.title_stem(), if self.session.dirty { " •" } else { "" });
+        let title = format!("{}{} - Wordgai", self.title_stem(), if self.session.dirty { " •" } else { "" });
         if title != self.sent_title {
             ctx.send_viewport_cmd(egui::ViewportCommand::Title(title.clone()));
             self.sent_title = title;

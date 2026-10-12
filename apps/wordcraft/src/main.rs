@@ -10,6 +10,7 @@
 #![deny(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::unimplemented, clippy::todo, clippy::unreachable)]
 
 mod animations;
+mod ai;
 #[cfg(target_os = "macos")]
 mod apple_events;
 mod clipboard;
@@ -207,6 +208,21 @@ fn services(file_dialog: file_dialogs::Hook, ctx: &egui::Context) -> Services {
         clipboard_html: Some(Box::new(clipboard::html)),
         clipboard_rtf: Some(Box::new(clipboard::rtf)),
         clipboard_formats: Some(Box::new(clipboard::formats)),
+        ai_complete: Some(Box::new({
+            let ctx = ctx.clone();
+            move |prompt| {
+                let (tx, rx) = std::sync::mpsc::channel();
+                let ctx = ctx.clone();
+                let worker_tx = tx.clone();
+                if let Err(error) = std::thread::Builder::new().name("wordcraft-ai".into()).spawn(move || {
+                    let _ = worker_tx.send(ai::complete(&prompt));
+                    ctx.request_repaint();
+                }) {
+                    let _ = tx.send(Err(format!("Couldn't start the AI request: {error}")));
+                }
+                rx
+            }
+        })),
         ..Default::default()
     }
 }
@@ -251,7 +267,7 @@ fn main() -> eframe::Result {
     if let Some(logger) = logger {
         match log_dir().filter(|_| prefs_enabled()) {
             Some(dir) => match logger.attach_dir(&dir) {
-                Ok(path) => log::info!("WordCraft {} ({}), log file {}", env!("CARGO_PKG_VERSION"), build_sha(), path.display()),
+                Ok(path) => log::info!("Wordgai {} ({}), log file {}", env!("CARGO_PKG_VERSION"), build_sha(), path.display()),
                 // Standard error only by now (`attach_dir` gave up on the file); unlike `eprintln!`, never panics.
                 Err(e) => log::warn!("no log file: {e}"),
             },
@@ -260,7 +276,7 @@ fn main() -> eframe::Result {
     }
     let mut options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
-            .with_title("WordCraft")
+            .with_title("Wordgai")
             .with_app_id("ai.storyteller.wordcraft")
             .with_inner_size([1440.0, 920.0])
             .with_min_inner_size([760.0, 480.0])
@@ -300,7 +316,7 @@ fn main() -> eframe::Result {
     #[cfg(target_os = "macos")]
     let apple_events = &apple_events;
     eframe::run_native(
-        "WordCraft",
+        "Wordgai",
         options,
         Box::new(move |cc| {
             // The system region picks the new document's paper, the units and the decimal

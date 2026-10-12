@@ -5,14 +5,14 @@
   <id>ai.storyteller.wordcraft</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>MIT OR Apache-2.0</project_license>
-  <name>WordCraft</name>
+  <name>Wordgai</name>
   <summary>Write and design documents; open and save Word files</summary>
   <developer id="ai.storyteller">
     <name>Learning Machines LLC</name>
   </developer>
   <description>
     <p>
-      WordCraft is a fast, open-source word processor with a familiar ribbon: styles, tables, track changes, references, mail merge, and .docx, PDF, ODT, RTF, HTML and Markdown files. It can be driven by AI agents over MCP.
+      Wordgai is a fast, open-source word processor with a familiar ribbon: styles, tables, track changes, references, mail merge, and .docx, PDF, ODT, RTF, HTML and Markdown files. It can be driven by AI agents over MCP.
     </p>
   </description>
   <launchable type="desktop-id">ai.storyteller.wordcraft.desktop</launchable>

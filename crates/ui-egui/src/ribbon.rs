@@ -259,6 +259,15 @@ pub fn show(app: &mut WordApp, ui: &mut Ui) {
                     if crate::widgets::icon_text_button(ui, "comment", tl!("Comments"), regular(12.0)).clicked() {
                         let _ = app.run("view.commentsPane", json!({}));
                     }
+                    ui.add_space(4.0);
+                    let ai_enabled = app.services.ai_complete.is_some();
+                    if ui
+                        .add_enabled(ai_enabled, egui::Button::new(tl!("AI writing")))
+                        .on_hover_text(tl!("Suggest a word or write and continue a document"))
+                        .clicked()
+                    {
+                        app.open_ai_writer();
+                    }
                 });
             });
         });

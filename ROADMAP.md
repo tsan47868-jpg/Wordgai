@@ -63,7 +63,7 @@ the two partial ones (real-world .docx, printing) complete, roughly.
 | Stability | 50% | 25–45 | [gaps.md](docs/gaps.md) (#3) |
 | Platforms | 95% (beyond Word on Linux, BSD, web) | 5–10 | this page |
 | Ecosystem and plugins | 15% | 40–80 + owner decisions | [gaps.md](docs/gaps.md) (#22) |
-| AI features | 40% (beyond Word for external agents; no in-app assistant) | 15–30 | [gaps.md](docs/gaps.md) (#25) |
+| AI features | 40% (MCP/CLI plus basic desktop word suggestions, drafting and continuation) | 15–30 | [gaps.md](docs/gaps.md) (#25) |
 
 ## Features
 
